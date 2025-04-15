@@ -1,0 +1,11 @@
+CHROM,POS,TYPE,REF,ALT,EVIDENCE,FTYPE,STRAND,NT_POS,AA_POS,EFFECT,LOCUS_TAG,GENE,PRODUCT
+9A-1-1_chromosome,102519,snp,G,T,T:20 G:0
+9A-1-1_chromosome,328840,snp,C,A,A:20 C:0
+9A-1-1_chromosome,328894,snp,C,A,A:20 C:0
+9A-1-1_chromosome,944804,snp,C,T,T:20 C:0
+9A-1-1_chromosome,1824969,snp,C,A,A:20 C:0
+9A-1-1_chromosome,2241882,snp,G,T,T:20 G:0
+9A-1-1_chromosome,3116317,snp,G,T,T:20 G:0
+9A-1-1_chromosome,3419265,snp,G,T,T:20 G:0
+9A-1-1_chromosome,4518770,snp,C,T,T:40 C:0
+9A-1-1_plasmid_pE2899,48666,snp,C,T,T:20 C:0

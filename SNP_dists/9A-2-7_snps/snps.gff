@@ -1,0 +1,4 @@
+##gff-version 3
+9A-1-1_chromosome	snippy:4.6.0	variation	907072	907072	.	.	0	note=snp A=>T T:20 A:0
+9A-1-1_chromosome	snippy:4.6.0	variation	2600274	2600274	.	.	0	note=snp C=>T T:20 C:0
+9A-1-1_chromosome	snippy:4.6.0	variation	4518770	4518770	.	.	0	note=snp C=>T T:20 C:0

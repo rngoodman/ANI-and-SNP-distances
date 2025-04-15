@@ -1,0 +1,19 @@
+##fileformat=VCFv4.2
+##commandLine="snippy-core --ref 9A-1-1.fasta --prefix core 9A-1-1_snps 9A-2-7_snps 9A-3-9_snps 9A-4-9_snps"
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=TYPE,Number=A,Type=String,Description="Allele type: snp ins del">
+##contig=<ID=9A-1-1_chromosome,len=4615880>
+##contig=<ID=9A-1-1_plasmid_pE2899,len=107891>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	9A-1-1_snps	9A-2-7_snps	9A-3-9_snps	9A-4-9_snps
+9A-1-1_chromosome	102519	.	G	T	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	328840	.	C	A	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	328894	.	C	A	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	907072	.	A	T	.	PASS	TYPE=snp	GT	0	1	0	0
+9A-1-1_chromosome	944804	.	C	T	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	1824969	.	C	A	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	2241882	.	G	T	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	2600274	.	C	T	.	PASS	TYPE=snp	GT	0	1	0	0
+9A-1-1_chromosome	3116317	.	G	T	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	3419265	.	G	T	.	PASS	TYPE=snp	GT	0	0	0	1
+9A-1-1_chromosome	4518770	.	C	T	.	PASS	TYPE=snp	GT	0	1	1	1
+9A-1-1_plasmid_pE2899	48666	.	C	T	.	PASS	TYPE=snp	GT	0	0	0	1

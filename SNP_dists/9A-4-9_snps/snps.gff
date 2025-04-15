@@ -1,0 +1,11 @@
+##gff-version 3
+9A-1-1_chromosome	snippy:4.6.0	variation	102519	102519	.	.	0	note=snp G=>T T:20 G:0
+9A-1-1_chromosome	snippy:4.6.0	variation	328840	328840	.	.	0	note=snp C=>A A:20 C:0
+9A-1-1_chromosome	snippy:4.6.0	variation	328894	328894	.	.	0	note=snp C=>A A:20 C:0
+9A-1-1_chromosome	snippy:4.6.0	variation	944804	944804	.	.	0	note=snp C=>T T:20 C:0
+9A-1-1_chromosome	snippy:4.6.0	variation	1824969	1824969	.	.	0	note=snp C=>A A:20 C:0
+9A-1-1_chromosome	snippy:4.6.0	variation	2241882	2241882	.	.	0	note=snp G=>T T:20 G:0
+9A-1-1_chromosome	snippy:4.6.0	variation	3116317	3116317	.	.	0	note=snp G=>T T:20 G:0
+9A-1-1_chromosome	snippy:4.6.0	variation	3419265	3419265	.	.	0	note=snp G=>T T:20 G:0
+9A-1-1_chromosome	snippy:4.6.0	variation	4518770	4518770	.	.	0	note=snp C=>T T:40 C:0
+9A-1-1_plasmid_pE2899	snippy:4.6.0	variation	48666	48666	.	.	0	note=snp C=>T T:20 C:0

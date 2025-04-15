@@ -1,0 +1,122 @@
+### echo snippy 4.6.0
+### cd /Users/richard.goodman/Library/CloudStorage/OneDrive-LSTM/Github/ANI-and-SNP-distances
+
+### /Users/richard.goodman/miniconda3/envs/ANI_SNP_dists/bin/snippy --report --outdir 9A-2-7_snps --ref 9A-1-1.fasta --ctgs 9A-2-7.fasta
+
+### samtools faidx reference/ref.fa
+
+
+### bwa index reference/ref.fa
+
+[bwa_index] Pack FASTA... 0.03 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.79 seconds elapse.
+[bwa_index] Update BWT... 0.02 sec
+[bwa_index] Pack forward-only FASTA... 0.02 sec
+[bwa_index] Construct SA from BWT and Occ... 0.34 sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: bwa index reference/ref.fa
+[main] Real time: 1.205 sec; CPU: 1.207 sec
+
+### mkdir -p reference/genomes && cp -f reference/ref.fa reference/genomes/ref.fa
+
+
+### ln -sf reference/ref.fa .
+
+
+### ln -sf reference/ref.fa.fai .
+
+
+### mkdir -p reference/ref && gzip -c reference/ref.gff > reference/ref/genes.gff.gz
+
+
+### bwa mem  -Y -M -R '@RG\tID:9A-2-7_snps\tSM:9A-2-7_snps' -t 8 reference/ref.fa fake_reads.fq | samclip --max 10 --ref reference/ref.fa.fai | samtools sort -n -l 0 -T /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T --threads 3 -m 2000M | samtools fixmate -m --threads 3 - - | samtools sort -l 0 -T /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T --threads 3 -m 2000M | samtools markdup -T /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T --threads 3 -r -s - - > snps.bam
+
+samtools markdup: warning, unable to calculate estimated library size. Read pairs 0 should be greater than duplicate pairs 0, which should both be non zero.
+
+COMMAND: samtools markdup -T /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T --threads 3 -r -s - -
+READ: 376824
+WRITTEN: 376539
+EXCLUDED: 20
+EXAMINED: 376804
+PAIRED: 0
+SINGLE: 376804
+DUPLICATE PAIR: 0
+DUPLICATE SINGLE: 285
+DUPLICATE PAIR OPTICAL: 0
+DUPLICATE SINGLE OPTICAL: 0
+DUPLICATE NON PRIMARY: 0
+DUPLICATE NON PRIMARY OPTICAL: 0
+DUPLICATE PRIMARY TOTAL: 285
+DUPLICATE TOTAL: 285
+ESTIMATED_LIBRARY_SIZE: 0
+
+
+### samtools index snps.bam
+
+
+### fasta_generate_regions.py reference/ref.fa.fai 320169 > reference/ref.txt
+
+
+### freebayes-parallel reference/ref.txt 8 -p 2 -P 0 -C 2 -F 0.05 --min-coverage 10 --min-repeat-entropy 1.0 -q 13 -m 60 --strict-vcf   -f reference/ref.fa snps.bam > snps.raw.vcf
+
+
+### bcftools view --include 'FMT/GT="1/1" && QUAL>=100 && FMT/DP>=10 && (FMT/AO)/(FMT/DP)>=0' snps.raw.vcf  | vt normalize -r reference/ref.fa - | bcftools annotate --remove '^INFO/TYPE,^INFO/DP,^INFO/RO,^INFO/AO,^INFO/AB,^FORMAT/GT,^FORMAT/DP,^FORMAT/RO,^FORMAT/AO,^FORMAT/QR,^FORMAT/QA,^FORMAT/GL' > snps.filt.vcf
+
+
+### cp snps.filt.vcf snps.vcf
+
+
+### /Users/richard.goodman/miniconda3/envs/ANI_SNP_dists/bin/snippy-vcf_to_tab --gff reference/ref.gff --ref reference/ref.fa --vcf snps.vcf > snps.tab
+
+Loading reference: reference/ref.fa
+Loaded 2 sequences.
+Loading features: reference/ref.gff
+Parsing variants: snps.vcf
+Converted 3 SNPs to TAB format.
+
+### /Users/richard.goodman/miniconda3/envs/ANI_SNP_dists/bin/snippy-vcf_extract_subs snps.filt.vcf > snps.subs.vcf
+
+
+### bcftools convert -Oz -o snps.vcf.gz snps.vcf
+
+
+### bcftools index -f snps.vcf.gz
+
+
+### bcftools consensus --sample 9A-2-7_snps -f reference/ref.fa -o snps.consensus.fa snps.vcf.gz
+
+Note: applying IUPAC codes based on FORMAT/GT in sample 9A-2-7_snps
+Applied 3 variants
+
+### bcftools convert -Oz -o snps.subs.vcf.gz snps.subs.vcf
+
+
+### bcftools index -f snps.subs.vcf.gz
+
+
+### bcftools consensus --sample 9A-2-7_snps -f reference/ref.fa -o snps.consensus.subs.fa snps.subs.vcf.gz
+
+Note: applying IUPAC codes based on FORMAT/GT in sample 9A-2-7_snps
+Applied 3 variants
+
+### rm -f snps.subs.vcf.gz snps.subs.vcf.gz.csi snps.subs.vcf.gz.tbi
+
+
+### rm -f fake_reads\.fq
+
+
+### samtools view -h -q 60 snps.bam | samtools sort -l 0 -T /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T --threads 3 -m 2000M > /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/snippy.61042.Q60.bam
+
+[bam_sort_core] merging from 0 files and 3 in-memory blocks...
+
+### samtools index /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/snippy.61042.Q60.bam
+
+
+### /Users/richard.goodman/miniconda3/envs/ANI_SNP_dists/bin/snippy-vcf_report --cpus 8 --bam /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/snippy.61042.Q60.bam --ref reference/ref.fa --vcf snps.vcf > snps.report.txt
+
+Parsing: snps.vcf
+Running: parallel -j 8 -k -a /var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/_1FaXihLqB
+
+### rm -f /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/snippy.61042.Q60.bam /private/var/folders/4z/zzk_6gv141x5_z8s85gk4b1hlzzy98/T/snippy.61042.Q60.bam.bai
+

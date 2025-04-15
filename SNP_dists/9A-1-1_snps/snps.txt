@@ -1,0 +1,6 @@
+DateTime	2025-04-15T14:18:18
+ReadFiles	fake_reads.fq
+Reference	/Users/richard.goodman/Library/CloudStorage/OneDrive-LSTM/Github/ANI-and-SNP-distances/9A-1-1.fasta
+ReferenceSize	4723771
+Software	snippy 4.6.0
+VariantTotal	0
