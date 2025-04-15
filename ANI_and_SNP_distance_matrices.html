@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.55">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ANI and SNP distance matrices</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ANI_and_SNP_distance_matrices_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ANI_and_SNP_distance_matrices_files/libs/quarto-html/quarto.js"></script>
+<script src="ANI_and_SNP_distance_matrices_files/libs/quarto-html/popper.min.js"></script>
+<script src="ANI_and_SNP_distance_matrices_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ANI_and_SNP_distance_matrices_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ANI_and_SNP_distance_matrices_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ANI_and_SNP_distance_matrices_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ANI_and_SNP_distance_matrices_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ANI_and_SNP_distance_matrices_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ANI_and_SNP_distance_matrices_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ANI and SNP distance matrices</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This tutorial will take <em>n</em> genome sequences and run algorithms to determine average nucleotide idenitities (ANI) and core genome single nucleotide polymorphisms (SNPs), visualising the distances as heatmaps in python.</p>
+<p>This workflow uses <a href="https://github.com/ParBLiSS/FastANI?tab=readme-ov-file">fastANI</a> for ANI, <a href="https://github.com/tseemann/snippy">snippy</a> and <a href="https://github.com/tseemann/snp-dists">snp-dists</a> for SNP distances, and seaborn and matplotlib in python to visualise the distances as heatmaps. For any analysis in bash it uses the conda package manager so make sure you have that installed.</p>
+</section>
+<section id="part-1---loading-sequence-data" class="level2">
+<h2 class="anchored" data-anchor-id="part-1---loading-sequence-data">Part 1 - Loading sequence data</h2>
+<p>Download files with wget</p>
+<pre class="{bash}"><code># 9A-1-1
+wget "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/026/119/875/GCF_026119875.1_ASM2611987v1/GCF_026119875.1_ASM2611987v1_genomic.fna.gz"
+# 9A-2-7
+wget "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/026/119/895/GCF_026119895.1_ASM2611989v1/GCF_026119895.1_ASM2611989v1_genomic.fna.gz"
+# 9A 3-9
+wget "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/026/119/915/GCF_026119915.1_ASM2611991v1/GCF_026119915.1_ASM2611991v1_genomic.fna.gz"
+# 9A-4-9
+wget "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/026/119/955/GCF_026119955.1_ASM2611995v1/GCF_026119955.1_ASM2611995v1_genomic.fna.gz"</code></pre>
+<p>Unzip all files</p>
+<pre class="{bash}"><code>gunzip *.fna.gz
+</code></pre>
+<p>Rename files to make data analysis easier</p>
+<pre class="{bash}"><code>mkdir fastas
+mv GCF_026119875.1_ASM2611987v1_genomic.fna fastas/9A-1-1.fasta 
+mv GCF_026119895.1_ASM2611989v1_genomic.fna fastas/9A-2-7.fasta
+mv GCF_026119915.1_ASM2611991v1_genomic.fna fastas/9A-3-9.fasta
+mv GCF_026119955.1_ASM2611995v1_genomic.fna fastas/9A-4-9.fasta
+</code></pre>
+</section>
+<section id="part-2---ani-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="part-2---ani-matrix">Part 2 - ANI matrix</h2>
+<section id="calculating-ani-with-bash" class="level3">
+<h3 class="anchored" data-anchor-id="calculating-ani-with-bash">2.1 - Calculating ANI with bash</h3>
+<p>We will be using <a href="https://github.com/ParBLiSS/FastANI?tab=readme-ov-file">fastANI</a> with <a href="https://anaconda.org/bioconda/fastani">bioconda</a> to determine ANI values for all of genomes compared against each other.</p>
+<pre class="{bash}"><code># conda create -n ANI_SNP_dists -y python=3.8
+conda activate ANI_SNP_dists
+conda install bioconda::fastani</code></pre>
+<p>Mkae a new folder called ANI</p>
+<pre class="{bash}"><code>mkdir ANI</code></pre>
+<p>Create a list of fasta genomes to determine ANI</p>
+<pre class="{bash}"><code>ls fastas/*.fasta &gt; genomes.txt
+
+cat genomes.txt</code></pre>
+<p>Check the list</p>
+<pre class="{bash}"><code>cat genomes.txt</code></pre>
+<p>For ANI of all vs all run fastANI with all the genomes in your list.</p>
+<p>Choosing the <code>--matrix</code> flag will output a matrix, this is what we will use to plot the heatmap</p>
+<pre class="{bash}"><code>fastANI --ql genomes.txt --rl genomes.txt -o ANI/E_coli_ANI.tsv --matrix</code></pre>
+<p>Rename the output matrix</p>
+<pre class="{bash}"><code>mv ANI/E_coli_ANI.tsv.matrix ANI/E_coli_ANI_matrix.tsv
+sed 's|fastas/||g' ANI/E_coli_ANI_matrix.tsv &gt; ANI/E_coli_ANI_matrix.tsv</code></pre>
+</section>
+<section id="visualising-ani-matrix-with-python" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-ani-matrix-with-python">2.2 - Visualising ANI matrix with python</h3>
+<section id="install-libraries" class="level4">
+<h4 class="anchored" data-anchor-id="install-libraries">2.2.1: Install libraries</h4>
+<div id="223b326d" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install libraries as necessary </span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#pip install openpyxl </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#pip install pandas </span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#pip install matplotlib </span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#pip install seaborn </span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#pip install numpy</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#import importlib.metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next load the libraries</p>
+<div id="c0061f04" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib <span class="im">as</span> mpl </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="convert-triangular-matrix-to-full-square-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="convert-triangular-matrix-to-full-square-matrix">2.2.2: Convert triangular matrix to full square matrix</h4>
+<p>Firstly we will covert the traingular matrix produced from fastANI to a full square matrix</p>
+<div id="2e6d9ab3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the file</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"ANI/E_coli_ANI_matrix.tsv"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> f.readlines()</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Skip the first line (header)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> lines[<span class="dv">1</span>:]</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Strip whitespace</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> [line.strip() <span class="cf">for</span> line <span class="kw">in</span> lines <span class="cf">if</span> line.strip()]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract strain names from the leftmost column</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>strain_names <span class="op">=</span> []</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> []</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> lines:</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    parts <span class="op">=</span> line.split(<span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    strain_names.append(parts[<span class="dv">0</span>])</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    values.append([<span class="bu">float</span>(x) <span class="cf">for</span> x <span class="kw">in</span> parts[<span class="dv">1</span>:]])</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(strain_names)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>ani_matrix <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill the lower triangle</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(values[i])):</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>        ani_matrix[i, j] <span class="op">=</span> values[i][j]</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>        ani_matrix[j, i] <span class="op">=</span> values[i][j]</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill the diagonal with 100s</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>np.fill_diagonal(ani_matrix, <span class="dv">100</span>)</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataFrame</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>ani_df <span class="op">=</span> pd.DataFrame(ani_matrix, index<span class="op">=</span>strain_names, columns<span class="op">=</span>strain_names)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove ".fasta" from column names</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>ani_df.columns <span class="op">=</span> ani_df.columns.<span class="bu">str</span>.replace(<span class="st">".fasta"</span>, <span class="st">""</span>)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove ".fasta" from index names</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>ani_df.index <span class="op">=</span> ani_df.index.<span class="bu">str</span>.replace(<span class="st">".fasta"</span>, <span class="st">""</span>)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Display to confirm</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ani_df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            9A-1-1      9A-2-7      9A-3-9      9A-4-9
+9A-1-1  100.000000   99.989120   99.981598   99.991730
+9A-2-7   99.989120  100.000000   99.983719   99.994034
+9A-3-9   99.981598   99.983719  100.000000   99.989388
+9A-4-9   99.991730   99.994034   99.989388  100.000000</code></pre>
+</div>
+</div>
+</section>
+<section id="write-a-function-to-create-the-ani-heatmaps" class="level4">
+<h4 class="anchored" data-anchor-id="write-a-function-to-create-the-ani-heatmaps">2.2.3: Write a function to create the ANI heatmaps</h4>
+<p>Next we write a function which masks half the dataset to create a triangular heatmap, with the added functionality of rotating the heatmap</p>
+<div id="94d600c6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_ani_heatmap(df, title<span class="op">=</span><span class="st">"ANI Heatmap"</span>, rotation<span class="op">=</span><span class="dv">0</span>, lower_legend<span class="op">=</span><span class="dv">95</span>, upper_legend<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make a copy to avoid modifying the original</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    df_plot <span class="op">=</span> df.copy()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply rotation first</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rotation <span class="op">==</span> <span class="dv">90</span>:</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.transpose()</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">180</span>:</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.iloc[::<span class="op">-</span><span class="dv">1</span>, ::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">270</span>:</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.iloc[::<span class="op">-</span><span class="dv">1</span>, ::<span class="op">-</span><span class="dv">1</span>].transpose()</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> np.zeros_like(df_plot, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    mask[np.triu_indices_from(mask, k<span class="op">=</span><span class="dv">1</span>)] <span class="op">=</span> <span class="va">True</span>  <span class="co"># k=1 excludes the diagonal</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rotation <span class="op">==</span> <span class="dv">90</span> <span class="kw">or</span> rotation <span class="op">==</span> <span class="dv">270</span>:</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> np.transpose(mask)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">180</span>:</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> np.flip(mask)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">10</span>))</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    sns.heatmap(</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>        df_plot, </span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>        annot<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">".2f"</span>, </span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        mask<span class="op">=</span>mask, </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        vmin<span class="op">=</span>lower_legend,</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>        vmax<span class="op">=</span>upper_legend,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>        annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">8</span>},</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>        xticklabels<span class="op">=</span>df_plot.columns, </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>        yticklabels<span class="op">=</span>df_plot.index, </span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>        cbar_kws<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"ANI (%)"</span>}</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>    plt.xticks(fontsize<span class="op">=</span><span class="dv">10</span>, rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>    plt.yticks(fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>    plt.title(title, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-the-ani-heatmap" class="level4">
+<h4 class="anchored" data-anchor-id="create-the-ani-heatmap">2.2.4: Create the ANI heatmap</h4>
+<p>We will produce an ANI matrix for <em>E. coli</em> species types <span class="citation" data-cites="Ec-ANI">@Ec-ANI</span></p>
+<div id="cell-Ec-ANI" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function to create the heatmap</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plot_ani_heatmap(df<span class="op">=</span>ani_df, title<span class="op">=</span><span class="st">"E. coli ANI Heatmap"</span>, rotation <span class="op">=</span><span class="dv">90</span>, lower_legend<span class="op">=</span><span class="fl">99.6</span>, upper_legend<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ec-ani" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="ANI_and_SNP_distance_matrices_files/figure-html/ec-ani-output-1.png" width="1094" height="950" class="figure-img"></p>
+<figcaption>E. coli ANI heatmap</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="part-3---snp-distance-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="part-3---snp-distance-matrix">Part 3 - SNP distance matrix</h2>
+<section id="calculating-snp-distances-with-bash" class="level3">
+<h3 class="anchored" data-anchor-id="calculating-snp-distances-with-bash">3.1 - Calculating SNP distances with bash</h3>
+<p>We will determine SNP distances with <a href="https://github.com/tseemann/snippy">snippy</a> and <a href="https://github.com/tseemann/snp-dists">snp-dists</a> with 9A-1-1 as reference</p>
+<p>We will activate the same conda environment used previously in <a href="#calculating-ani-with-bash">section 2.1</a>.</p>
+<p>But here we will add more programs:</p>
+<ul>
+<li><a href="https://github.com/tseemann/snippy">snippy</a></li>
+<li><a href="https://github.com/tseemann/snp-dists">snp-dists</a></li>
+<li><a href="https://www.gnu.org/software/parallel/">parallel</a></li>
+</ul>
+<section id="download-software" class="level4">
+<h4 class="anchored" data-anchor-id="download-software">3.1.1: Download software</h4>
+<pre class="{bash}"><code>conda activate ANI_SNP_dists
+conda install -c conda-forge -c bioconda -c defaults snippy
+conda install -c bioconda -c conda-forge snp-dists
+conda install bioconda::parallel</code></pre>
+</section>
+<section id="run-snippy" class="level4">
+<h4 class="anchored" data-anchor-id="run-snippy">3.1.2: Run Snippy</h4>
+<p>Use <a href="https://github.com/tseemann/snippy"><code>snippy</code></a> to generate all SNPs.</p>
+<p>Make a new directory</p>
+<pre class="{bash}"><code>mkdir SNP_dists</code></pre>
+<p>Set reference file for SNP calculations.</p>
+<pre class="{bash}"><code>REF=9A-1-1.fasta</code></pre>
+<p>Use <code>sed</code> to remove <code>.fastq</code> from <code>.txt</code> file</p>
+<pre class="{bash}"><code>sed 's|fastas/||g' genomes.txt &gt; genome_names.txt
+sed -e 's/.fasta//' genomes_names.txt &gt; genome_names.txt</code></pre>
+<p>Check the new <code>.txt</code> file containing list of genome names</p>
+<pre class="{bash}"><code>cat genome_names.txt</code></pre>
+<p>The we use <a href="https://www.gnu.org/software/parallel/">parallel</a> on our list of genomes to run snippy:</p>
+<pre class="{bash}"><code>cat genome_names.txt | parallel snippy --report --outdir SNP_dists/{}_snps --ref $REF --ctgs fastas/{}.fasta</code></pre>
+<p>This produces several files:</p>
+</section>
+<section id="run-snippy-core" class="level4">
+<h4 class="anchored" data-anchor-id="run-snippy-core">3.1.3: Run Snippy-core</h4>
+<p>Use <code>snippy-core</code> from <a href="https://github.com/tseemann/snippy">snippy</a> to generate core SNPs</p>
+<pre class="{bash}"><code>snippy-core --ref $REF --outdir SNP_dists --prefix core SNP_dists/*_snps</code></pre>
+<p>This produces several files:</p>
+<ul>
+<li><code>core.full.aln</code>: The full core genome alignment in FASTA format.</li>
+<li><code>core.aln</code>: The core SNP alignment in FASTA format (only variable sites).</li>
+<li><code>core.tab</code>: A table summarizing the SNP differences.</li>
+</ul>
+</section>
+<section id="generate-a-pairwise-snp-distance-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="generate-a-pairwise-snp-distance-matrix">3.1.4: Generate a Pairwise SNP Distance Matrix</h4>
+<p>Once you have the core SNP alignment (<code>core.aln</code>), use <a href="https://github.com/tseemann/snp-dists"><code>snp-dists</code></a> to calculate pairwise SNP distances.</p>
+<pre class="{bash}"><code>snp-dists SNP_dists/core.aln &gt; SNP_dists/snp_matrix.tsv</code></pre>
+<p>This will generate a pairwise SNP distance matrix (<code>snp_matrix.tsv</code>) where:</p>
+<ul>
+<li>Rows and columns correspond to isolates.</li>
+<li>The values represent the number of SNP differences between isolates</li>
+</ul>
+</section>
+</section>
+<section id="visualising-snp-distance-matrix-with-python" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-snp-distance-matrix-with-python">3.2 - Visualising SNP distance matrix with python</h3>
+<p>Make sure you have all the required libraries installed, if you need to install them see <a href="#install-libraries">section 2.2.1</a></p>
+<section id="read-and-clean-the-data" class="level4">
+<h4 class="anchored" data-anchor-id="read-and-clean-the-data">3.2.1: Read and clean the data</h4>
+<div id="68aa87f2" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the SNP matrix with first column as row index</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>snp_df <span class="op">=</span> pd.read_csv(<span class="st">"SNP_dists/snp_matrix.tsv"</span>, sep<span class="op">=</span><span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove reference file</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>snp_df <span class="op">=</span> snp_df.drop(<span class="st">"Reference"</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>snp_df <span class="op">=</span> snp_df.drop(<span class="st">"Reference"</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove "_snps" from column names</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>snp_df.columns <span class="op">=</span> snp_df.columns.<span class="bu">str</span>.replace(<span class="st">"_snps"</span>, <span class="st">""</span>)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove "_snps" from index names</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>snp_df.index <span class="op">=</span> snp_df.index.<span class="bu">str</span>.replace(<span class="st">"_snps"</span>, <span class="st">""</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify it loaded correctly</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(snp_df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 9A-1-1  9A-2-7  9A-3-9  9A-4-9
+snp-dists 0.8.2                                
+9A-1-1                0       3       1      10
+9A-2-7                3       0       2      11
+9A-3-9                1       2       0       9
+9A-4-9               10      11       9       0</code></pre>
+</div>
+</div>
+</section>
+<section id="create-a-function-which-makes-a-snp-distance-heatmap" class="level4">
+<h4 class="anchored" data-anchor-id="create-a-function-which-makes-a-snp-distance-heatmap">3.2.2: Create a function which makes a SNP distance heatmap</h4>
+<div id="143d4427" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_snp_heatmap(df, title<span class="op">=</span><span class="st">"ANI Heatmap"</span>, rotation<span class="op">=</span><span class="dv">0</span>, lower_legend<span class="op">=</span><span class="dv">95</span>, upper_legend<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make a copy to avoid modifying the original</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    df_plot <span class="op">=</span> df.copy()</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply rotation first</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rotation <span class="op">==</span> <span class="dv">90</span>:</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.transpose()</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">180</span>:</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.iloc[::<span class="op">-</span><span class="dv">1</span>, ::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">270</span>:</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        df_plot <span class="op">=</span> df_plot.iloc[::<span class="op">-</span><span class="dv">1</span>, ::<span class="op">-</span><span class="dv">1</span>].transpose()</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> np.zeros_like(df_plot, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    mask[np.triu_indices_from(mask, k<span class="op">=</span><span class="dv">1</span>)] <span class="op">=</span> <span class="va">True</span>  <span class="co"># k=1 excludes the diagonal</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rotation <span class="op">==</span> <span class="dv">90</span> <span class="kw">or</span> rotation <span class="op">==</span> <span class="dv">270</span>:</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> np.transpose(mask)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> rotation <span class="op">==</span> <span class="dv">180</span>:</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> np.flip(mask)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">10</span>))</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    sns.heatmap(</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>        df_plot, </span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>        annot<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">".2f"</span>, </span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>        mask<span class="op">=</span>mask, </span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>        vmin<span class="op">=</span>lower_legend,</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>        vmax<span class="op">=</span>upper_legend,</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>        annot_kws<span class="op">=</span>{<span class="st">"size"</span>: <span class="dv">8</span>},</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>        xticklabels<span class="op">=</span>df_plot.columns, </span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>        yticklabels<span class="op">=</span>df_plot.index, </span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>        cbar_kws<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"SNP count"</span>}</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    plt.xticks(fontsize<span class="op">=</span><span class="dv">10</span>, rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    plt.yticks(fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    plt.title(title, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="create-the-snp-distance-heatmaps" class="level3">
+<h3 class="anchored" data-anchor-id="create-the-snp-distance-heatmaps">3.2.3: Create the SNP distance heatmaps</h3>
+<p>Next we will produce an SNP distance matrix for <em>E. coli</em> species types <span class="citation" data-cites="Ec-SNP">@Ec-SNP</span></p>
+<div id="cell-Ec-SNP" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function to create the heatmap</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fig_title <span class="op">=</span> <span class="st">"SNP distances E. coli"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>create_snp_heatmap(title<span class="op">=</span>fig_title, df <span class="op">=</span> snp_df, rotation<span class="op">=</span><span class="dv">90</span>, lower_legend<span class="op">=</span><span class="dv">0</span>, upper_legend<span class="op">=</span><span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ec-snp" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="ANI_and_SNP_distance_matrices_files/figure-html/ec-snp-output-1.png" width="1064" height="950" class="figure-img"></p>
+<figcaption>E. coli SNP distance heatmap</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
