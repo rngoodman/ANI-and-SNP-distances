@@ -28,4 +28,11 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
 * loss and gain of mobile genetic elements including plasmids
 * homologous recombination 
 
-The combination of ANI % and SNP distances provides more information about the differences between isolates which can help answer the question about clonality more fully.
+The combination of ANI % and SNP distances provides more information about the differences between isolates which can help answer the question about clonality more fully. However, to more confidently determine clonality I would suggest further analyses such as:
+
+* [Circular whole genome comparison](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
+* Phylogenetic analyses
+* Multi-locus sequence typing (MLST)
+* Species-specific typing
+  + K and O types for *K. pneumoniae*
+  + Clermon typing for *E. coli*
