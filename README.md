@@ -16,7 +16,7 @@ ANI and SNP distance matrices are useful for comparing the relatedness of genome
 
 Determining ANI thresholds whereby two or more isolates are clonal or not clonal is a difficult task. 
 
-[Rodriguez et. al, 2024](https://doi.org/10.1128/mbio.02696-23) analysed 18,123 genomes to determine where the thresholds lay which distinguished certain taxonomic ranks:
+[Rodriguez *et. al* (2024)](https://doi.org/10.1128/mbio.02696-23) analysed 18,123 genomes to determine where the thresholds lay which distinguished certain taxonomic ranks:
 
 * same species - 95%
 * same sequence type - 99.5%
