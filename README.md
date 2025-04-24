@@ -34,8 +34,8 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
   + [Circular whole genome comparison with circulise](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
 * Phylogenetic analyses
 * Multi-locus sequence typing (MLST)
-  + [mlst](https://github.com/tseemann/mlst) for most bacterial genomes
-  + [Kleborate](https://github.com/klebgenomics/Kleborate) for *Klebsiella* spp. genomes
+  + [mlst for most bacterial genomes](https://github.com/tseemann/mlst)
+  + [Kleborate for *Klebsiella* spp. genomes](https://github.com/klebgenomics/Kleborate)
 * Species-specific typing
-  + K and O types for *K. pneumoniae* with [Kaptive](https://github.com/klebgenomics/Kaptive)
-  + [Clermon typing](https://github.com/iame-researchCenter/ClermonTyping) for *E. coli*
+  + [K and O types for *K. pneumoniae* with Kaptive](https://github.com/klebgenomics/Kaptive)
+  + [Clermon typing for *E. coli*](https://github.com/iame-researchCenter/ClermonTyping)
