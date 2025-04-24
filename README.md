@@ -30,7 +30,8 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
 
 [The combination of ANI % and SNP distances](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides more information about the differences between isolates, which can help answer the question about clonality more fully. However, to more confidently determine clonality, I would suggest further analyses including:
 
-* [Circular whole genome comparison](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
+* Whole genome comparison
+  - [Circular whole genome comparison with circulize](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
 * Phylogenetic analyses
 * Multi-locus sequence typing (MLST)
 * Species-specific typing
