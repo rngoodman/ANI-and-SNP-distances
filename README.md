@@ -22,13 +22,13 @@ Determining ANI thresholds whereby two or more isolates are clonal or not clonal
 * same sequence type - 99.5%
 * same strain - 99.9%
 
-Yet these aren't always definitive thresholds, the gain of a large plasmid could lower the ANI <99.9% even though the chromosome would be identical. There can be lots of biological phenomena which can cause a clonal population to diverge such as:
+Yet these aren't always definitive thresholds, the gain of a large plasmid could lower the ANI <99.9% even though the chromosome would be identical. There are many biological phenomena which cause a clonal population to diverge such as:
 
 * point mutations over time
 * loss and gain of mobile genetic elements including plasmids
 * homologous recombination 
 
-The combination of ANI % and SNP distances provides more information about the differences between isolates which can help answer the question about clonality more fully. However, to more confidently determine clonality I would suggest further analyses such as:
+[The combination of ANI % and SNP distances](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides more information about the differences between isolates, which can help answer the question about clonality more fully. However, to more confidently determine clonality, I would suggest further analyses including:
 
 * [Circular whole genome comparison](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
 * Phylogenetic analyses
