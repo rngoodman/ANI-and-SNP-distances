@@ -31,9 +31,11 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
 [The combination of ANI % and SNP distances](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides more information about the differences between isolates, which can help answer the question about clonality more fully. However, to more confidently determine clonality, I would suggest further analyses including:
 
 * Whole genome comparison
-  - [Circular whole genome comparison with circulize](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
+  + [Circular whole genome comparison with circulise](https://rngoodman.github.io/circular-genome-comparisons/circular_genome_comparisons.html)
 * Phylogenetic analyses
 * Multi-locus sequence typing (MLST)
+  + [mlst](https://github.com/tseemann/mlst) for most bacterial genomes
+  + [Kleborate](https://github.com/klebgenomics/Kleborate) for *Klebsiella* spp. genomes
 * Species-specific typing
-  + K and O types for *K. pneumoniae*
-  + Clermon typing for *E. coli*
+  + K and O types for *K. pneumoniae* with [Kaptive](https://github.com/klebgenomics/Kaptive)
+  + [Clermon typing](https://github.com/iame-researchCenter/ClermonTyping) for *E. coli*
