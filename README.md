@@ -6,7 +6,7 @@
 
 Here is my [code for producing ANI and SNP distance matrices](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) for 4 *E. coli* genomes. However, the same code can be applied to *n* bacterial genomes. 
 
-## About 
+## About
 
 [This tutorial](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides code for taking *n* genome sequences and running algorithms to determine average nucleotide identities (ANI) and core genome single nucleotide polymorphisms (SNPs), visualising the distances as heatmaps in python. It uses [fastANI](https://github.com/ParBLiSS/FastANI?tab=readme-ov-file) for ANI, [snippy](https://github.com/tseemann/snippy) and [snp-dists](https://github.com/tseemann/snp-dists) for SNP distances, and seaborn and matplotlib in python to visualise the distances as heatmaps.
 
