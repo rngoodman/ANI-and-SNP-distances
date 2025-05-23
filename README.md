@@ -26,7 +26,7 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
 
 * point mutations over time
 * loss and gain of mobile genetic elements including plasmids
-* homologous recombination 
+* homologous recombination
 
 [The combination of ANI % and SNP distances](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides more information about the differences between isolates, which can help answer the question about clonality more fully. However, to more confidently determine clonality, I would suggest further analyses including:
 
