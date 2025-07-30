@@ -22,7 +22,7 @@ Determining ANI thresholds whereby two or more isolates are clonal or not clonal
 * same sequence type - 99.5%
 * same strain - 99.9%
 
-[Watt *et. al* (2025)](https://doi.org/10.1038/s41467-024-55103-2) analysed 5471 *Escherichia coli* genome sequences from different One Health sectors in Australia and determined a threshold of ≤ 100 SNPs detected cross-source linkage of isolates. 
+[Watt *et. al* (2025)](https://doi.org/10.1038/s41467-024-55103-2) analysed 5471 *Escherichia coli* genome sequences from different One Health sectors in Australia and concluded that a threshold of ≤ 100 SNPs detected cross-source linkage of isolates. 
 
 Yet these aren't always definitive thresholds, the gain of a large plasmid could lower the ANI <99.9% even though the chromosome would be identical. There are many biological phenomena which cause a clonal population to diverge such as:
 
