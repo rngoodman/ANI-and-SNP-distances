@@ -16,11 +16,20 @@ ANI and SNP distance matrices are useful for comparing the relatedness of genome
 
 Determining ANI thresholds whereby two or more isolates are clonal or not clonal is a difficult task. 
 
+### ANI 
+
 [Rodriguez *et. al* (2024)](https://doi.org/10.1128/mbio.02696-23) analysed 18,123 genomes to determine where the thresholds lay which distinguished certain taxonomic ranks:
 
 * same species - 95%
 * same sequence type - 99.5%
 * same strain - 99.9%
+
+### SNPs
+
+[Watt *et. al* (2025)](https://doi.org/10.1038/s41467-024-55103-2) analysed 5471 *Escherichia coli* genome sequences from different One Health sectors in Australia and determined a threshold of ≤ 100 SNP detected cross-source linkage of isolates. 
+
+
+
 
 Yet these aren't always definitive thresholds, the gain of a large plasmid could lower the ANI <99.9% even though the chromosome would be identical. There are many biological phenomena which cause a clonal population to diverge such as:
 
