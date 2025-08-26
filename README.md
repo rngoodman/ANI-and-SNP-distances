@@ -14,6 +14,9 @@ ANI and SNP distance matrices are useful for comparing the relatedness of genome
 
 ## What classes as clonal?
 
+
+### ANI thresholds
+
 Determining ANI thresholds whereby two or more isolates are clonal or not clonal is a difficult task. 
 
 [Rodriguez *et. al* (2024)](https://doi.org/10.1128/mbio.02696-23) analysed 18,123 genomes to determine where the thresholds lay which distinguished certain taxonomic ranks:
@@ -22,6 +25,8 @@ Determining ANI thresholds whereby two or more isolates are clonal or not clonal
 * same sequence type - 99.5%
 * same strain - 99.99%
 
+### SNP thresholds
+
 [Watt *et. al* (2025)](https://doi.org/10.1038/s41467-024-55103-2) analysed 5471 *Escherichia coli* genome sequences from different One Health sectors in Australia and concluded that a threshold of ≤ 100 SNPs detected cross-source linkage of isolates. 
 
 Yet these aren't always definitive thresholds, the gain of a large plasmid could lower the ANI <99.99% even though the chromosome would be identical. There are many biological phenomena which cause a clonal population to diverge such as:
@@ -29,6 +34,8 @@ Yet these aren't always definitive thresholds, the gain of a large plasmid could
 * point mutations over time
 * loss and gain of mobile genetic elements including plasmids
 * homologous recombination
+
+### The best methods for determining isolate relatedness
 
 [The combination of ANI % and SNP distances](https://rngoodman.github.io/ANI-and-SNP-distances/ANI_and_SNP_distance_matrices.html) provides more information about the differences between isolates, which can help answer the question about clonality more fully. However, to more confidently determine clonality, I would suggest further analyses including:
 
